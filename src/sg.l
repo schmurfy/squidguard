@@ -153,6 +153,7 @@ within return WITHIN;
 outside return OUTSIDE;
 else return ELSE;
 ip          return IP;
+port        return PORT;
 {ip}        {yylval.string = yytext; return IPADDR;}
 [/]{d}+     {yylval.string = yytext; return CIDR;}
 [/]{ip}     {yylval.string = yytext; return IPCLASS;}

@@ -171,6 +171,8 @@ struct SquidInfo {
   char srcDomain[MAX_BUF];
   char ident[MAX_BUF];
   char method[MAX_BUF];
+  int  proxy_port;
+  char proxy_address[MAX_BUF];
 };
 
 
@@ -272,6 +274,7 @@ struct Source {
   struct sgDb *domainDb;
   struct sgDb *userDb;
   struct Time *time;
+  int proxy_port;
   int within;
   int cont_search;
   struct UserQuota userquota;
@@ -345,7 +348,7 @@ void   sgSourceExecUserList __P((char *));
 void   sgSourceDomain __P((char *));
 void   sgSourceIpList __P((char *));
 struct Source *sgSourceFindName __P((char *));
-struct Source *sgFindSource __P((struct Source *, char *, char *, char *));
+struct Source *sgFindSource __P((struct Source *, char *, char *, char *, int));
 void   sgSourceTime __P((char *, int));
 
 void   sgDest __P((char *));
@@ -382,6 +385,7 @@ void   sgTimePrint __P(());
 
 void   sgSetIpType __P((int, char *, int));
 void   sgIp __P((char *));
+void   sgProxyPort __P((char *));
 struct Ip *sgIpLast __P((struct Source *));
 
 void   sgAcl __P((char *, char *, int));

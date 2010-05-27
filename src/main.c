@@ -192,7 +192,7 @@ int main(argc, argv, envp)
 	  strncpy(tmp,squidInfo.src,MAX_BUF-1);
           tmp[MAX_BUF-1] = 0;   /* force null termination */
 	  globalLogFile = NULL;
-	  src = sgFindSource(src, tmp,squidInfo.ident,squidInfo.srcDomain);
+	  src = sgFindSource(src, tmp,squidInfo.ident,squidInfo.srcDomain,squidInfo.proxy_port);
 	  acl = sgAclCheckSource(src);
 	  if((redirect = sgAclAccess(src,acl,&squidInfo)) == NULL){
 	    if(src == NULL || src->cont_search == 0){

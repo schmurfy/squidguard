@@ -89,7 +89,7 @@ rfc1738_unescape(char *s)
 %token DESTINATION REWRITE ACL TIME TVAL DVAL DVALCRON
 %token SOURCE CIDR IPCLASS CONTINUE
 %token IPADDR DBHOME DOMAINLIST URLLIST EXPRESSIONLIST IPLIST
-%token DOMAIN USER USERLIST USERQUERY LDAPUSERSEARCH USERQUOTA IP NL NUMBER
+%token DOMAIN USER USERLIST USERQUERY LDAPUSERSEARCH USERQUOTA IP PORT_NUMBER PORT NL NUMBER
 %token PASS REDIRECT LOGDIR SUBST CHAR MINUTELY HOURLY DAILY WEEKLY DATE
 %token WITHIN OUTSIDE ELSE LOGFILE ANONYMOUS VERBOSE CONTINIOUS SPORADIC
 %token LDAPCACHETIME EXECUSERLIST EXECCMD LDAPPROTOVER
@@ -206,6 +206,7 @@ source_content:     DOMAIN domain
                     | USERQUOTA NUMBER NUMBER WEEKLY { sgSourceUserQuota($2,$3,"604800");} 
                     | USERQUOTA NUMBER NUMBER NUMBER { sgSourceUserQuota($2,$3,$4);} 
                     | IP ips
+                    | PORT NUMBER { sgProxyPort($2); }
                     | IPLIST WORD { sgSourceIpList($2); }
                     | WITHIN WORD { sgSourceTime($2,WITHIN); }
                     | OUTSIDE WORD { sgSourceTime($2,OUTSIDE); }
@@ -525,6 +526,7 @@ void sgSource(source)
   }
   sp = (struct Source *)sgCalloc(1,sizeof(struct Source));
   sp->ip=NULL;
+  sp->proxy_port = 0;
   sp->userDb=NULL;
   sp->domainDb=NULL;
   sp->active = 1;
@@ -975,18 +977,19 @@ void sgSourceIpList(file)
 
 #if __STDC__
 struct Source *sgFindSource (struct Source *bsrc, 
-			     char *net, char *ident, char *domain)
+			     char *net, char *ident, char *domain, int proxy_port)
 #else
-struct Source *sgFindSource (bsrc, net, ident, domain)
+struct Source *sgFindSource (bsrc, net, ident, domain, proxy_port)
      struct Source *bsrc;
      char *net;
      char *ident;
      char *domain;
+     int proxy_port;
 #endif
 {
   struct Source *s;
   struct Ip *ip;
-  int foundip, founduser, founddomain, unblockeduser;
+  int foundip, founduser, founddomain, foundport, unblockeduser;
   unsigned long i, octet = 0, *op;
   struct UserInfo *userquota;
   if(net != NULL){
@@ -995,10 +998,22 @@ struct Source *sgFindSource (bsrc, net, ident, domain)
       octet = *op;
   }
   for(s=bsrc; s != NULL; s = s->next){
-    foundip = founduser = founddomain = 0;
+    foundip = founduser = founddomain = foundport = 0;
     unblockeduser = 1;
     if(s->active == 0)
       continue;
+      
+    if(s->proxy_port != 0){
+      if(s->proxy_port == proxy_port){
+        sgLogError("sgFindSource: proxy port matched");
+        foundport = 1;
+      } 
+    }
+    else {
+      sgLogError("sgFindSource: no proxy port");
+      foundport = 1;
+    }
+    
     if(s->ip != NULL){
       if(net == NULL)
 	foundip = 0;
@@ -1089,7 +1104,7 @@ struct Source *sgFindSource (bsrc, net, ident, domain)
       }
     } else
       founddomain = 1;
-    if(founduser && foundip && founddomain){
+    if(founduser && foundip && founddomain && foundport){
       if(unblockeduser)
 	return s;
       else {
@@ -2157,6 +2172,20 @@ void sgIp(name)
     strcpy(ip->str,name);
   }
 }
+
+#if __STDC__
+void sgProxyPort(char *port)
+#else
+void sgProxyPort(port)
+      char *port;
+#endif
+{
+  int tmp;
+  tmp = atoi(port);
+  lastSource->proxy_port = tmp;
+  sgLogError("source port: %d", tmp);
+}
+
 
 #if __STDC__
 struct Ip *sgIpLast(struct Source *s)

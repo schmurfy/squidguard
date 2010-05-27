@@ -243,6 +243,16 @@ int parseLine(line, s)
     case 2: /* method */
       strcpy(s->method,p);
       break;
+    case 3: /* myip=127.0.0.1 */
+      o = strchr(p, '=');
+      e = strchr(p, '\0');
+      strncpy(s->proxy_address, o+1, e-(o+1));
+      break;
+
+    case 4: /* myport=3128 */
+      o = strchr(p, '=');
+      s->proxy_port = atoi(o+1);
+      break;
     }
     i++;
   }
