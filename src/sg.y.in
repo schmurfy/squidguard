@@ -556,7 +556,7 @@ void sgSourceEnd()
  struct Source *s;
  s = lastSource;
  if(s->ip == NULL && s->domainDb == NULL && s->userDb == NULL
-       && s->ldapurlcount == 0){
+       && s->ldapurlcount == 0 && s->proxy_port == 0){
    sgLogError("sourceblock %s missing active content, set inactive",s->name);
    s->time = NULL;
    s->active = 0;
@@ -567,7 +567,7 @@ void sgSourceEnd()
 {
  struct Source *s;
  s = lastSource;
- if(s->ip == NULL && s->domainDb == NULL && s->userDb == NULL){
+ if(s->ip == NULL && s->domainDb == NULL && s->userDb == NULL && s->proxy_port == 0){
    sgLogError("sourceblock %s missing active content, set inactive",s->name);
    s->time = NULL;
    s->active = 0;
