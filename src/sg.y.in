@@ -1005,12 +1005,12 @@ struct Source *sgFindSource (bsrc, net, ident, domain, proxy_port)
       
     if(s->proxy_port != 0){
       if(s->proxy_port == proxy_port){
-        sgLogError("sgFindSource: proxy port matched");
+        // sgLogError("sgFindSource: proxy port matched");
         foundport = 1;
       } 
     }
     else {
-      sgLogError("sgFindSource: no proxy port");
+      // sgLogError("sgFindSource: no proxy port");
       foundport = 1;
     }
     
