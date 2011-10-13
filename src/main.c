@@ -196,20 +196,14 @@ int main(argc, argv, envp)
 	  acl = sgAclCheckSource(src);
 	  if((redirect = sgAclAccess(src,acl,&squidInfo)) == NULL){
 	    if(src == NULL || src->cont_search == 0){
-	      sgLogError("Yeah I am ALSO here !");
-	      fprintf(stdout,"%s %s/%s %s %s\n",buf,squidInfo.src,
-      		    squidInfo.srcDomain,squidInfo.ident,
-      		    squidInfo.method); 
+	      puts(""); 
 	      break;
 	    } else
 	      if(src->next != NULL){
 		src = src->next;
 		continue;
 	      } else {
-                sgLogError("Yeah I am here !");
-		fprintf(stdout,"%s %s/%s %s %s\n",buf,squidInfo.src,
-        		    squidInfo.srcDomain,squidInfo.ident,
-        		    squidInfo.method);
+		puts("");
 		break;
 	      }
 	  } else {
